@@ -1,0 +1,76 @@
+buildscript {
+    ext {
+        springBootVersion = '1.3.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") 
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'spring-boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
+apply plugin: 'jacoco'
+
+jar {
+    baseName = 'enterprise-twitter'
+    version = '0.0.1-SNAPSHOT'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://oss.sonatype.org/content/repositories/releases" }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude: ['com/shivang/twitter/EnterpriseTwitterApplication**',
+                    'com/shivang/twitter/config/SwaggerConfig**'])
+        })
+    }
+}
+
+check.dependsOn jacocoTestReport
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.cloud:spring-cloud-starter-hystrix')
+    compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
+    compile('io.springfox:springfox-swagger-ui:2.4.0')
+    compile('io.springfox:springfox-swagger2:2.4.0')
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.4')
+    testCompile('org.codehaus.groovy:groovy-all:2.4.4')
+    testCompile('com.athaydes:spock-reports:1.2.10')
+    testCompile('org.spockframework:spock-spring:1.0-groovy-2.4')
+    testCompile('cglib:cglib-nodep:3.2.2')
+    testCompile('com.jayway.jsonpath:json-path:2.2.0')
+
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Brixton.RC2"
+    }
+}
+
+tasks.withType(Test) {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
