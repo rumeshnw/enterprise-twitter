@@ -2,6 +2,8 @@
 A project to load feeds for a given Twitter user
 
 # Project health
+[![Build Status](https://travis-ci.org/shivangshah/enterprise-twitter.svg?branch=master)](https://travis-ci.org/shivangshah/enterprise-twitter)
+[![coverage](https://img.shields.io/codecov/c/github/shivangshah/enterprise-twitter/master.svg)](https://codecov.io/gh/shivangshah/enterprise-twitter)
 
 # Building the application
 Gradle wrapper is already included so all needs to be done is: 
