@@ -6,7 +6,7 @@ A project to load feeds for a given Twitter user
 [![coverage](https://img.shields.io/codecov/c/github/shivangshah/enterprise-twitter/master.svg)](https://codecov.io/gh/shivangshah/enterprise-twitter)
 
 # Building the application
-Gradle wrapper is already included so all needs to be done is: 
+Gradle wrapper is already included so all that needs to be done is: 
 
 `./gradlew clean build`
 
@@ -39,14 +39,14 @@ you can navigate here: `http://localhost:8080/api-docs`
 - Gradle - For building purposes
 - Spock Test Framework - For BDD test approach
 - Springfox-Swagger - Swagger 2.0 support
+- Spring Data Elasticsearch - For embedded Elasticsearch support
 
-# List of TODOS: 
+# List of TODOS
 - [x] Basic Implementation and workflow working
 - [x] Get Elasticsearch to work as an embeddable datasource
 - [x] PoC with spring-JPA
-- [ ] Add unit test cases (Spock)
-- [ ] Add integration test cases (Spock + MockMvc)
+- [x] Add integration test cases (Spock)
 - [x] Update Logging
 - [x] Exception Handling (handled by spring boot magic & Controller advice !)
-- [ ] Update Documentation
+- [x] Update Documentation
 - [x] Swagger Support
