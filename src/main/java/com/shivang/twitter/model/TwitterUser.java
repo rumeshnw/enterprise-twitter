@@ -6,7 +6,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import java.util.List;
 
 @Document(indexName = "user", type = "user", shards = 1, replicas = 0, refreshInterval = "-1")
-public class User {
+public class TwitterUser {
 
     @Id
     private String id;
@@ -18,10 +18,10 @@ public class User {
     private List<String> followerIds;
     private long timeCreatedInMillis;
 
-    public User() {
+    public TwitterUser() {
     }
 
-    public User(String firstName, String lastName, String username, String password, List<String> followingIds, List<String> followerIds) {
+    public TwitterUser(String firstName, String lastName, String username, String password, List<String> followingIds, List<String> followerIds) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;

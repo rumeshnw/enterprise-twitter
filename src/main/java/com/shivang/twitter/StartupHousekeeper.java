@@ -1,7 +1,7 @@
 package com.shivang.twitter;
 
 import com.shivang.twitter.model.Tweet;
-import com.shivang.twitter.model.User;
+import com.shivang.twitter.model.TwitterUser;
 import com.shivang.twitter.repository.TweetRepository;
 import com.shivang.twitter.repository.UserRepository;
 import org.slf4j.Logger;
@@ -39,49 +39,51 @@ public class StartupHousekeeper implements ApplicationListener<ContextRefreshedE
     }
 
     private void saveUsersAndTweets() {
-        LOGGER.debug("Adding users .. ");
-        List<User> users = new ArrayList<>();
+        LOGGER.debug("Adding twitterUsers .. ");
+        List<TwitterUser> twitterUsers = new ArrayList<>();
         for (int i = 0; i < numberOfUsers; i++) {
-            User user = new User("first" + i, "last" + i, "username" + i, "password" + i, new ArrayList<>(), new ArrayList<>());
-            user = this.userRepository.save(user);
-            users.add(user);
+            TwitterUser twitterUser = new TwitterUser("first" + i, "last" + i, "username" + i, "password" + i, new ArrayList<>(), new ArrayList<>());
+            twitterUser = this.userRepository.save(twitterUser);
+            twitterUsers.add(twitterUser);
         }
 
-        Observable.from(users)
-                .flatMap((Func1<User, Observable<User>>) user ->
-                        Observable.zip(updateUserWithFollowingAndFollowers(user, users),
+        Observable.from(twitterUsers)
+                .flatMap((Func1<TwitterUser, Observable<TwitterUser>>) user ->
+                        Observable.zip(updateUserWithFollowingAndFollowers(user, twitterUsers),
                                 createAndSaveTweetsForUser(user), (user1, user2) -> user1))
-                .subscribe();
-        LOGGER.debug("Users and their corresponding Tweets populated !");
+                .toList().toBlocking().last();
+        LOGGER.debug("All Twitter users and their corresponding tweets are populated !");
     }
 
-    private Observable<User> updateUserWithFollowingAndFollowers(User user, List<User> allUsers) {
-        return Observable.create(new Observable.OnSubscribe<User>() {
+    private Observable<TwitterUser> updateUserWithFollowingAndFollowers(TwitterUser twitterUser, List<TwitterUser> allTwitterUsers) {
+        return Observable.create(new Observable.OnSubscribe<TwitterUser>() {
             @Override
-            public void call(Subscriber<? super User> subscriber) {
-                LOGGER.debug("Updating user {} with followers & followings ..", user.getUsername());
-                for (int i = 0; i < allUsers.size(); i++) {
-                    if (!allUsers.get(i).getId().equals(user.getId())) {
-                        user.getFollowerIds().add(allUsers.get(i).getId());
-                        user.getFollowingIds().add(allUsers.get(i).getId());
+            public void call(Subscriber<? super TwitterUser> subscriber) {
+                LOGGER.debug("Updating twitterUser {} with followers & followings ..", twitterUser.getUsername());
+                for (int i = 0; i < allTwitterUsers.size(); i++) {
+                    if (!allTwitterUsers.get(i).getId().equals(twitterUser.getId())) {
+                        twitterUser.getFollowerIds().add(allTwitterUsers.get(i).getId());
+                        twitterUser.getFollowingIds().add(allTwitterUsers.get(i).getId());
                     }
                 }
-                subscriber.onNext(userRepository.save(user));
+                subscriber.onNext(userRepository.save(twitterUser));
+                subscriber.onCompleted();
             }
         })
                 .subscribeOn(Schedulers.io());
     }
 
-    private Observable<User> createAndSaveTweetsForUser(User user) {
-        return Observable.create(new Observable.OnSubscribe<User>() {
+    private Observable<TwitterUser> createAndSaveTweetsForUser(TwitterUser twitterUser) {
+        return Observable.create(new Observable.OnSubscribe<TwitterUser>() {
             @Override
-            public void call(Subscriber<? super User> subscriber) {
-                LOGGER.debug("Adding tweets by user {}", user.getUsername());
+            public void call(Subscriber<? super TwitterUser> subscriber) {
+                LOGGER.debug("Adding tweets by twitterUser {}", twitterUser.getUsername());
                 for (int j = 0; j < numberOfTweetsPerUser; j++) {
-                    tweetRepository.save(new Tweet(user.getId(),
-                            "tweet number is " + j + " by user " + user.getUsername()));
+                    tweetRepository.save(new Tweet(twitterUser.getId(),
+                            "tweet number is " + j + " by twitterUser " + twitterUser.getUsername()));
                 }
-                subscriber.onNext(user);
+                subscriber.onNext(twitterUser);
+                subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io());
     }

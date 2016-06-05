@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}") 
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
 }
 
@@ -38,7 +38,7 @@ jacocoTestReport {
         classDirectories = files(classDirectories.files.collect {
             fileTree(dir: it,
                     exclude: ['com/shivang/twitter/EnterpriseTwitterApplication**',
-                    'com/shivang/twitter/config/SwaggerConfig**'])
+                              'com/shivang/twitter/config/SwaggerConfig**'])
         })
     }
 }
@@ -48,6 +48,7 @@ check.dependsOn jacocoTestReport
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.cloud:spring-cloud-starter-hystrix')
     compile('org.springframework.boot:spring-boot-starter-data-elasticsearch')
     compile('io.springfox:springfox-swagger-ui:2.4.0')
@@ -71,6 +72,6 @@ dependencyManagement {
 
 tasks.withType(Test) {
     testLogging {
-        events "passed", "skipped", "failed"
+        events "passed", "skipped", "failed", "standardOut", "standardError"
     }
 }

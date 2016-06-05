@@ -3,7 +3,7 @@ package com.shivang.twitter.service;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.shivang.twitter.model.CustomException;
 import com.shivang.twitter.model.Tweet;
-import com.shivang.twitter.model.User;
+import com.shivang.twitter.model.TwitterUser;
 import com.shivang.twitter.repository.TweetRepository;
 import com.shivang.twitter.repository.UserRepository;
 import org.slf4j.Logger;
@@ -26,22 +26,23 @@ public class UserService {
 
     @Autowired
     public UserService(UserRepository userRepository, TweetRepository tweetRepository) {
-        LOGGER.debug("User service initialized ..");
+        LOGGER.debug("TwitterUser service initialized ..");
         this.userRepository = userRepository;
         this.tweetRepository = tweetRepository;
     }
 
     @HystrixCommand
-    public Observable<User> getUserByUsername(String username) {
-        return Observable.create(new Observable.OnSubscribe<User>() {
+    public Observable<TwitterUser> getUserByUsername(String username) {
+        return Observable.create(new Observable.OnSubscribe<TwitterUser>() {
             @Override
-            public void call(Subscriber<? super User> subscriber) {
+            public void call(Subscriber<? super TwitterUser> subscriber) {
                 try {
-                    User user = userRepository.getUserByUsername(username);
-                    if (user == null) {
-                        throw new CustomException(HttpStatus.NOT_FOUND, "user not found with username: " + username);
+                    TwitterUser twitterUser = userRepository.getUserByUsername(username);
+                    if (twitterUser == null) {
+                        throw new CustomException(HttpStatus.NOT_FOUND, "twitterUser not found with username: " + username);
                     }
-                    subscriber.onNext(user);
+                    subscriber.onNext(twitterUser);
+                    subscriber.onCompleted();
                 } catch (Exception ex) {
                     subscriber.onError(ex);
                 }
@@ -50,17 +51,15 @@ public class UserService {
     }
 
     @HystrixCommand
-    public Observable<Page<Tweet>> login(String username, String password, Integer page, Integer pageSize) {
+    public Observable<Page<Tweet>> getUserFeed(String username, Integer page, Integer pageSize) {
         return Observable.create(new Observable.OnSubscribe<Page<Tweet>>() {
             @Override
             public void call(Subscriber<? super Page<Tweet>> subscriber) {
                 try {
-                    User user = userRepository.getUserByUsername(username);
-                    if (user == null || !user.getPassword().equals(password)) {
-                        throw new CustomException(HttpStatus.UNAUTHORIZED, "invalid username or password provided");
-                    }
-                    subscriber.onNext(tweetRepository.findByUserIdIn(user.getFollowingIds(),
+                    TwitterUser twitterUser = userRepository.getUserByUsername(username);
+                    subscriber.onNext(tweetRepository.findByUserIdIn(twitterUser.getFollowingIds(),
                             new PageRequest(page, pageSize, Sort.Direction.DESC, "timeCreatedInMillis")));
+                    subscriber.onCompleted();
                 } catch (Exception ex) {
                     subscriber.onError(ex);
                 }
@@ -74,12 +73,10 @@ public class UserService {
             @Override
             public void call(Subscriber<? super Page<Tweet>> subscriber) {
                 try {
-                    User user = userRepository.getUserByUsername(username);
-                    if (user == null) {
-                        throw new CustomException(HttpStatus.NOT_FOUND, "user not found with username: " + username);
-                    }
-                    subscriber.onNext(tweetRepository.findByUserId(user.getId(),
+                    TwitterUser twitterUser = userRepository.getUserByUsername(username);
+                    subscriber.onNext(tweetRepository.findByUserId(twitterUser.getId(),
                             new PageRequest(page, pageSize, Sort.Direction.DESC, "timeCreatedInMillis")));
+                    subscriber.onCompleted();
                 } catch (Exception ex) {
                     subscriber.onError(ex);
                 }
@@ -88,13 +85,50 @@ public class UserService {
     }
 
     @HystrixCommand
-    public Observable<Page<User>> getUsers(Integer page, Integer pageSize) {
-        return Observable.create(new Observable.OnSubscribe<Page<User>>() {
+    public Observable<Page<TwitterUser>> getUsers(Integer page, Integer pageSize) {
+        return Observable.create(new Observable.OnSubscribe<Page<TwitterUser>>() {
             @Override
-            public void call(Subscriber<? super Page<User>> subscriber) {
+            public void call(Subscriber<? super Page<TwitterUser>> subscriber) {
                 try {
-                    Page<User> users = userRepository.findAll(new PageRequest(page, pageSize, Sort.Direction.DESC, "timeCreatedInMillis"));
+                    Page<TwitterUser> users = userRepository.findAll(new PageRequest(page, pageSize, Sort.Direction.DESC, "timeCreatedInMillis"));
                     subscriber.onNext(users);
+                    subscriber.onCompleted();
+                } catch (Exception ex) {
+                    subscriber.onError(ex);
+                }
+            }
+        });
+    }
+
+    @HystrixCommand
+    public Observable<Page<TwitterUser>> getFollowers(String username, Integer page, Integer pageSize) {
+        return Observable.create(new Observable.OnSubscribe<Page<TwitterUser>>() {
+            @Override
+            public void call(Subscriber<? super Page<TwitterUser>> subscriber) {
+                try {
+                    TwitterUser user = userRepository.getUserByUsername(username);
+                    Page<TwitterUser> users = userRepository.findByIdIn(user.getFollowerIds(),
+                            new PageRequest(page, pageSize, Sort.Direction.DESC, "timeCreatedInMillis"));
+                    subscriber.onNext(users);
+                    subscriber.onCompleted();
+                } catch (Exception ex) {
+                    subscriber.onError(ex);
+                }
+            }
+        });
+    }
+
+    @HystrixCommand
+    public Observable<Page<TwitterUser>> getFollowings(String username, Integer page, Integer pageSize) {
+        return Observable.create(new Observable.OnSubscribe<Page<TwitterUser>>() {
+            @Override
+            public void call(Subscriber<? super Page<TwitterUser>> subscriber) {
+                try {
+                    TwitterUser user = userRepository.getUserByUsername(username);
+                    Page<TwitterUser> users = userRepository.findByIdIn(user.getFollowingIds(),
+                            new PageRequest(page, pageSize, Sort.Direction.DESC, "timeCreatedInMillis"));
+                    subscriber.onNext(users);
+                    subscriber.onCompleted();
                 } catch (Exception ex) {
                     subscriber.onError(ex);
                 }

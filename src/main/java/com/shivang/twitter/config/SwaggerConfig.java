@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -29,7 +30,8 @@ public class SwaggerConfig {
     public Docket TwitterFeedApi(SwaggerApiInfo swaggerApiInfo) {
         return new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
-                .tags(new Tag("Twitter User Service", "Service for twitter users and their feeds"))
+                .tags(new Tag("Twitter TwitterUser Service", "Service for twitter users and their feeds"))
+                .ignoredParameterTypes(Authentication.class)
                 .alternateTypeRules(
                         newRule(typeResolver.resolve(DeferredResult.class,
                                 typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
