@@ -1,10 +1,10 @@
-package com.shivang.twitter.controller
+package com.shivang.twitter.integrationtests.controller
 
 import com.shivang.twitter.EnterpriseTwitterApplication
+import com.shivang.twitter.integrationtests.support.ResponsePageImpl
 import com.shivang.twitter.model.Tweet
 import com.shivang.twitter.model.TwitterUser
 import com.shivang.twitter.repository.UserRepository
-import com.shivang.twitter.support.ResponsePageImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.SpringApplicationConfiguration
 import org.springframework.boot.test.WebIntegrationTest

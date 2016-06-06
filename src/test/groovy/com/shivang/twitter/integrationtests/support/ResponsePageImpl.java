@@ -1,4 +1,4 @@
-package com.shivang.twitter.support;
+package com.shivang.twitter.integrationtests.support;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
