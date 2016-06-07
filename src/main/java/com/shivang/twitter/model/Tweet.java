@@ -3,7 +3,7 @@ package com.shivang.twitter.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-@Document(indexName = "tweet", type = "tweet", shards = 1, replicas = 0, refreshInterval = "-1")
+@Document(indexName = "tweet", type = "tweet", shards = 1, refreshInterval = "-1")
 public class Tweet {
 
     @Id

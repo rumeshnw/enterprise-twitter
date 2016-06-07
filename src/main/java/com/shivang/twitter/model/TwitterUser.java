@@ -5,7 +5,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.util.List;
 
-@Document(indexName = "user", type = "user", shards = 1, replicas = 0, refreshInterval = "-1")
+@Document(indexName = "user", type = "user", shards = 1, refreshInterval = "-1")
 public class TwitterUser {
 
     @Id
