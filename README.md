@@ -31,6 +31,10 @@ I have also added support for `Swagger 2.0` using `springfox`. All you have to d
 - Multiple apis should show up. Expand to get detailed documentation on the APIs and try it out from the UI itself !
 - Additionally, if you are interested in pulling up API contracts (eventually can be used for `Contract Testing`), 
 you can navigate here: `http://localhost:8080/api-docs`
+## Credentials to use for authentication: 
+    `username0`: `password0`
+    `username1`: `password1`
+  so on .. upto `username9`: `password9`
 
 # Libraries used
 - Spring Actuator - Get built-in capabilities for debug endpoints (such as `/health`, `/info` etc)
